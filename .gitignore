@@ -1,0 +1,5 @@
+*.swp
+*.pyc
+activate
+__pycache__
+main/local_settings.py

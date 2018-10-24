@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block "content" %}
+<table class="detail">
+<tbody>
+<tr>
+    <th align="right">OAuth2 client key:</th>
+    <td>{{ client_key }}</td>
+</tr>
+<tr>
+    <th align="right">OAuth2 client secret:</th>
+    <td>{{ client_secret }}</td>
+</tr>
+<tr>
+    <th align="right">User authenticated Code:</th>
+    <td>{{ code }}</td>
+</tr>
+<tr>
+    <th align="right">Refresh token:</th>
+    <td>{{ refresh_token }}</td>
+</tr>
+<tr>
+    <th align="right">Access token:</th>
+    <td>{{ access_token }}</td>
+</tr>
+<tr>
+    <th align="right">Username:</th>
+    <td>{{ username }}</td>
+</tr>
+<tr>
+    <td></td>
+    <td>
+        <input type="button" value="Хадгалах"/>
+    </td>
+</tr>
+</tbody>
+</table>
+{% endblock %}
