@@ -15,7 +15,8 @@ cp main/local_settings.py.def main/local_settings.py
 pip install -r requirements.txt
 ```
 
-3. Create database
-```sql
-CREATE DATABASE bbapi CHARACTER SET utf8 COLLATE utf8_general_ci;
+3. Create database and migrate
+```sh
+echo "CREATE DATABASE bbapi CHARACTER SET utf8 COLLATE utf8_general_ci;" | mysql -uroot -p
+./manage.py migrate
 ```

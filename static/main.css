@@ -1,5 +1,15 @@
-body{
+body {
+    padding: 0;
+    margin: 0;
+}
+
+body, input{
     font-size: 1.4rem;
+    color: #333;
+}
+
+input {
+    padding: .4rem 1rem;
 }
 
 table td, table th{
@@ -8,4 +18,26 @@ table td, table th{
 
 table.detail th{
     background-color: rgba(0,0,0,.15);
+}
+
+.form-error {
+    color: red;
+}
+
+
+.wrapper {
+    margin: 4rem auto;
+    width: 940px;
+    border: 1px solid rgba(0,0,0,.15);
+    box-shadow: 0 7px 25px rgba(0,0,0,.35);
+}
+
+.menu a {
+    padding: .4rem 1rem;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.main {
+    padding: 30px;
 }

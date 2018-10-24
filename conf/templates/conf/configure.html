@@ -1,38 +1,75 @@
 {% extends "layout.html" %}
 
 {% block "content" %}
-<table class="detail">
-<tbody>
-<tr>
-    <th align="right">OAuth2 client key:</th>
-    <td>{{ client_key }}</td>
-</tr>
-<tr>
-    <th align="right">OAuth2 client secret:</th>
-    <td>{{ client_secret }}</td>
-</tr>
-<tr>
-    <th align="right">User authenticated Code:</th>
-    <td>{{ code }}</td>
-</tr>
-<tr>
-    <th align="right">Refresh token:</th>
-    <td>{{ refresh_token }}</td>
-</tr>
-<tr>
-    <th align="right">Access token:</th>
-    <td>{{ access_token }}</td>
-</tr>
-<tr>
-    <th align="right">Username:</th>
-    <td>{{ username }}</td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <input type="button" value="Хадгалах"/>
-    </td>
-</tr>
-</tbody>
-</table>
+
+<h1>Bitbucket тохиргоо</h1>
+
+<form method="post" novalidate>{% csrf_token %}
+
+    <table class="detail">
+    <tbody>
+    <tr>
+        <th align="right">OAuth2 client key:</th>
+        <td>
+            {{ form.client_key }}
+            {% if form.client_key.errors %}
+            <div class="form-error">Алдаатай байна</div>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th align="right">OAuth2 client secret:</th>
+        <td>
+            {{ form.client_secret }}
+            {% if form.client_secret.errors %}
+            <div class="form-error">Алдаатай байна</div>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th align="right">User authenticated Code:</th>
+        <td>
+            {{ form.code }}
+            {% if form.code.errors %}
+            <div class="form-error">Алдаатай байна</div>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th align="right">Refresh token:</th>
+        <td>
+            {{ form.refresh_token }}
+            {% if form.refresh_token.errors %}
+            <div class="form-error">Алдаатай байна</div>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th align="right">Access token:</th>
+        <td>
+            {{ form.access_token }}
+            {% if form.access_token.errors %}
+            <div class="form-error">Алдаатай байна</div>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th align="right">Username:</th>
+        <td>
+            {{ form.username }}
+            {% if form.username.errors %}
+            <div class="form-error">Алдаатай байна</div>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>
+            <input type="submit" value="Хадгалах"/>
+        </td>
+    </tr>
+    </tbody>
+    </table>
+
+</form>
 {% endblock %}
