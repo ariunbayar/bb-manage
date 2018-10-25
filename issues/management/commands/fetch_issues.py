@@ -1,3 +1,4 @@
+from datetime import datetime
 import requests
 
 from django.conf import settings
@@ -5,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand
 
 from conf.utils import get_setting, set_setting
+from issues.models import Repo
 
 
 class Command(BaseCommand):
@@ -60,6 +62,8 @@ class Command(BaseCommand):
 
     def load_url(self, url):
 
+        print('loading url: %s' % url)
+
         headers = {'Authorization': 'Bearer ' + self.conf_access_token}
         r = requests.get(url, headers=headers)
 
@@ -79,16 +83,29 @@ class Command(BaseCommand):
 
     def fetch_repos(self):
 
+        last_fetch_date = get_setting('last_fetch_at', date=True)
+        if last_fetch_date:
+            print('last fetch is at: %s' % last_fetch_date.strftime(settings.DATETIME_FORMAT))
         print('fetching repos...')
 
         url = 'https://api.bitbucket.org/2.0/repositories/%s' % self.conf_username
+
+        num_repos = 0
         while url:
             rsp = self.load_url(url)
-            for repo in rsp.get('values', []):
-                print('%s - %s - %s' % (repo.get('name'), repo.get('full_name'), repo.get('slug')))
-                # TODO
-                pass
+            for values in rsp.get('values', []):
+                num_repos += 1
+                repo = Repo.objects.filter(slug=values.get('slug')).last()
+                if not repo:
+                    repo = Repo()
+                    repo.slug = values.get('slug')
+                repo.name = values.get('name')
+                repo.save()
             url = rsp.get('next')
+
+        print('finished fetching %s repo details. ' % num_repos)
+
+        set_setting('last_fetch_at', datetime.now())
 
     def handle(self, *args, **options):
         self.load_settings()

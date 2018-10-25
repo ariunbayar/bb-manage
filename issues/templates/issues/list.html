@@ -1,5 +1,29 @@
 {% extends "layout.html" %}
 
 {% block "content" %}
-lskdjfl
+<p>Last fetch at: {{ last_fetch_at | date:'Y-m-d H:i' }}</p>
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Created</th>
+            <th>Updated</th>
+            <th>Sync</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for repo in repos %}
+        <tr>
+            <td>{{ repo.id }}</td>
+            <td><a href="{% url "issues-detail" repo.id %}">{{ repo.name }}</a></td>
+            <td>{{ repo.slug }}</td>
+            <td>{{ repo.created_at | date:'Y-m-d H:i'}}</td>
+            <td>{{ repo.updated_at | date:'Y-m-d H:i'}}</td>
+            <td> {% if repo.sync_issues %}yes{% endif %} </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

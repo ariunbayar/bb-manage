@@ -4,13 +4,20 @@ body {
 }
 
 body, input{
+    font-family: "Fira Sans Extra Condensed";
     font-size: 1.4rem;
+    font-weight: 100;
     color: #333;
 }
 
 input {
     padding: .4rem 1rem;
 }
+
+th, h1 {
+    font-weight: 200;
+}
+
 
 table td, table th{
     padding: .4rem 1rem;
@@ -27,14 +34,13 @@ table.detail th{
 
 .wrapper {
     margin: 4rem auto;
-    width: 940px;
+    width: 1240px;
     border: 1px solid rgba(0,0,0,.15);
     box-shadow: 0 7px 25px rgba(0,0,0,.35);
 }
 
 .menu a {
     padding: .4rem 1rem;
-    font-size: 1rem;
     text-transform: uppercase;
 }
 
