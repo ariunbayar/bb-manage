@@ -135,3 +135,6 @@ STATICFILES_DIRS = [
 
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
+
+
+INTERNAL_IPS = ['127.0.0.1']
