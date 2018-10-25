@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block "content" %}
+
+<table>
+    <tbody>
+        <tr>
+            <th align="right">Repository name:</th>
+            <td>{{ repo.name }}</td>
+        </tr>
+        <tr>
+            <th align="right">Slug:</th>
+            <td>{{ repo.slug }}</td>
+        </tr>
+        <tr>
+            <th align="right">Created:</th>
+            <td>{{ repo.created_at | date:'Y-m-d H:i'}}</td>
+        </tr>
+        <tr>
+            <th align="right">Updated:</th>
+            <td>{{ repo.updated_at | date:'Y-m-d H:i'}}</td>
+        </tr>
+        <tr>
+            <th align="right">Syncronize issues:</th>
+            <td>
+                <div>{% if repo.sync_issues %}yes{% else %}stopped sync{% endif %} </div>
+                <form method="post" action="{% url "repo-toggle-sync-issues" repo.slug %}">
+                    {% csrf_token %}
+                    <input type="submit" value="toggle">
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

@@ -42,8 +42,12 @@ table.detail th{
 .menu a {
     padding: .4rem 1rem;
     text-transform: uppercase;
+    text-decoration: underline;
 }
 
 .main {
     padding: 30px;
 }
+
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }

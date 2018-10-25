@@ -28,6 +28,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'issues.apps.IssuesConfig',
+    'repo.apps.RepoConfig',
     'conf.apps.ConfConfig',
     'django.contrib.admin',
     'django.contrib.auth',

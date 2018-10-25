@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand
 
 from conf.utils import get_setting, set_setting
-from issues.models import Repo
+from repo.models import Repo
 
 
 class Command(BaseCommand):
