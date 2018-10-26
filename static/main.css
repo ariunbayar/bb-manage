@@ -39,6 +39,10 @@ table.detail th{
     box-shadow: 0 7px 25px rgba(0,0,0,.35);
 }
 
+.menu {
+    padding: 30px 30px 0 30px;
+}
+
 .menu a {
     padding: .4rem 1rem;
     text-transform: uppercase;

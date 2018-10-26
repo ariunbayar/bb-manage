@@ -2,6 +2,15 @@
 
 {% block "content" %}
 
+{% if fetch_queue %}
+    <p>Queued fetch repositories task at {{ fetch_queue.created_at | date:'Y-m-d H:i' }}</p>
+{% else %}
+    <form method="post" action="{% url "queue-fetch-repo" %}">
+        {% csrf_token %}
+        <input type="submit" value="Fetch repositories"/>
+    </form>
+{% endif %}
+
 <p>Last fetch at: {{ last_fetch_at | date:'Y-m-d H:i' }}</p>
 <table>
     <thead>

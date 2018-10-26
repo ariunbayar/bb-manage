@@ -7,6 +7,8 @@ from django.core.management.base import BaseCommand
 
 from conf.utils import get_setting, set_setting
 from repo.models import Repo
+from repo.models import FetchQueue
+from issues.models import Issue
 
 
 class Command(BaseCommand):
@@ -83,10 +85,7 @@ class Command(BaseCommand):
 
     def fetch_repos(self):
 
-        last_fetch_date = get_setting('last_fetch_at', date=True)
-        if last_fetch_date:
-            print('last fetch is at: %s' % last_fetch_date.strftime(settings.DATETIME_FORMAT))
-        print('fetching repos...')
+        print('fetching repositories')
 
         url = 'https://api.bitbucket.org/2.0/repositories/%s' % self.conf_username
 
@@ -105,8 +104,58 @@ class Command(BaseCommand):
 
         print('finished fetching %s repo details. ' % num_repos)
 
-        set_setting('last_fetch_at', datetime.now())
+    def fetch_issues(self, repo):
+        assert isinstance(repo, Repo), "Invalid repo given to fetch %r" % repo
+
+        print('fetching issues for %s (%s)' % (repo.name, repo.slug))
+
+        url = 'https://api.bitbucket.org/2.0/repositories/%s/%s/issues/' % (self.conf_username, repo.slug)
+
+        num_issues = 0
+        while url:
+            rsp = self.load_url(url)
+            for values in rsp.get('values', []):
+                num_issues += 1
+
+                issue = Issue.objects.filter(repository=repo, id=values.get('id')).last() or Issue()
+                issue.assignee = values.get('assignee', {}).get('username') if values.get('assignee') else None
+                issue.state = values.get('state')
+                issue.title = values.get('title')
+                issue.type = values.get('type')
+                issue.kind = values.get('kind')
+                issue.content_raw = values.get('content', {}).get('raw')
+                issue.content_html = values.get('content', {}).get('html')
+                issue.priority = values.get('priority')
+                issue.repository = repo
+                issue.save()
+                # TODO fetch comments
+            url = rsp.get('next')
+
+        print('finished fetching %s issues for %s (%s). ' % (num_issues, repo.name, repo.slug))
 
     def handle(self, *args, **options):
+
         self.load_settings()
-        self.fetch_repos()
+
+        items = FetchQueue.objects.filter(is_processed=False).order_by('-created_at')
+        if items.count() == 0:
+            return
+
+        last_fetch_date = get_setting('last_fetch_at', date=True)
+        if last_fetch_date:
+            print('last fetch is at: %s' % last_fetch_date.strftime(settings.DATETIME_FORMAT))
+
+        is_repos_fetched = False
+        issues_fetched_repos = []
+
+        for item in items:
+            if item.fetch_type == FetchQueue.objects.FETCH_ISSUES and item.repository.slug not in issues_fetched_repos:
+                self.fetch_issues(item.repository)
+                issues_fetched_repos.append(item.repository.slug)
+            if item.fetch_type == FetchQueue.objects.FETCH_REPOSITORIES and not is_repos_fetched:
+                self.fetch_repos()
+                is_repos_fetched = True
+            item.is_processed = True
+            item.save()
+
+        set_setting('last_fetch_at', datetime.now())

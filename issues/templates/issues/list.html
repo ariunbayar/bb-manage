@@ -2,12 +2,39 @@
 
 {% block "content" %}
 <ul>
-    <li><a href="#">Update all</a></li>
+    <li><a href="{% url "issues-fetch" %}">Update all</a></li>
     {% for repo in repos %}
     <li>
         {{ repo.slug }} -
-        <a href="#">update</a>
+        <a href="{% url "issues-fetch-repo" repo.slug %}">update</a>
     </li>
     {% endfor %}
 </ul>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Assignee</th>
+            <th>Repository</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for issue in issues %}
+        <tr>
+            <td>{{ issue.id }}</td>
+            <td>{{ issue.title }}</td>
+            <td>{{ issue.type }}</td>
+            <td>{{ issue.priority }}</td>
+            <td>{{ issue.state }}</td>
+            <td>{{ issue.assignee }}</td>
+            <td>{{ issue.repository.name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
