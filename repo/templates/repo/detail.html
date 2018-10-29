@@ -21,10 +21,10 @@
             <td>{{ repo.updated_at | date:'Y-m-d H:i'}}</td>
         </tr>
         <tr>
-            <th align="right">Syncronize issues:</th>
+            <th align="right">Watching:</th>
             <td>
-                <div>{% if repo.sync_issues %}yes{% else %}stopped sync{% endif %} </div>
-                <form method="post" action="{% url "repo-toggle-sync-issues" repo.slug %}">
+                <div>{% if repo.is_watching %}yes{% else %}not watching{% endif %} </div>
+                <form method="post" action="{% url "repo-toggle-watching" repo.slug %}">
                     {% csrf_token %}
                     <input type="submit" value="toggle">
                 </form>

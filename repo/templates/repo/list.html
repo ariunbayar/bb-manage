@@ -2,25 +2,31 @@
 
 {% block "content" %}
 
-{% if fetch_queue %}
-    <p>Queued fetch repositories task at {{ fetch_queue.created_at | date:'Y-m-d H:i' }}</p>
-{% else %}
-    <form method="post" action="{% url "queue-fetch-repo" %}">
-        {% csrf_token %}
-        <input type="submit" value="Fetch repositories"/>
-    </form>
-{% endif %}
+<ul>
+    <li>Last fetch at: {{ last_fetch_at | date:'Y-m-d H:i' }}</li>
+    <li>
+        Showing {{ num_repos }} repositories.
+        <a href="{% url "all-repos" %}">{{ num_repos_hidden }} repositories are hidden.</a>
+    </li>
+    <li>Fetch repository details:
+        {% if fetch_queue_repo_details %}
+            Queued fetch repositories task at {{ fetch_queue_repo_details.created_at | date:'Y-m-d H:i' }}
+        {% else %}
+            <a href="{% url "queue-fetch-repo" %}" class="btn">fetch</a>
+        {% endif %}
+    </li>
+</ul>
 
-<p>Last fetch at: {{ last_fetch_at | date:'Y-m-d H:i' }}</p>
 <table>
     <thead>
         <tr>
             <th>#</th>
             <th>Name</th>
-            <th>Slug</th>
+            <th>Open issues</th>
             <th>Created</th>
             <th>Updated</th>
-            <th>Sync</th>
+            <th>Watching</th>
+            <th>Fetch queue</th>
         </tr>
     </thead>
     <tbody>
@@ -28,10 +34,17 @@
         <tr>
             <td>{{ repo.id }}</td>
             <td><a href="{% url "repo-detail" repo.slug %}">{{ repo.name }}</a></td>
-            <td>{{ repo.slug }}</td>
+            <td>{{ repo.get_num_open_issues }}</td>
             <td>{{ repo.created_at | date:'Y-m-d H:i'}}</td>
             <td>{{ repo.updated_at | date:'Y-m-d H:i'}}</td>
-            <td> {% if repo.sync_issues %}yes{% endif %} </td>
+            <td> {% if repo.is_watching %}yes{% endif %} </td>
+            <td>
+                {% if repo.get_fetch_queue %}
+                    {{ repo.get_fetch_queue.updated_at | date:'Y-m-d H:i' }}
+                {% else %}
+                    <a href="{% url "queue-fetch-issues" repo.slug %}" class="btn">fetch</a>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>

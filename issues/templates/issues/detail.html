@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block "content" %}
+
+<h1> {{ issue.repository.name }} - #{{ issue.issue_id }} - {{ issue.title }}</h1>
+
+<table>
+<tbody>
+    <tr>
+        <th align="right">Assignee</th>
+        <td>{{ issue.assignee }}</td>
+    </tr>
+    <tr>
+        <th align="right">Type</th>
+        <td>{{ issue.type }}</td>
+    </tr>
+    <tr>
+        <th align="right">Priority</th>
+        <td>{{ issue.priority }}</td>
+    </tr>
+    <tr>
+        <th align="right">Status</th>
+        <td>{{ issue.state }}</td>
+    </tr>
+    <tr>
+        <th align="right" valign="top">{{ issue.reporter }}<br>created an issue<br>{{ issue.created_at_bb | date:'Y-m-d H:i' }}</th>
+        <td><pre>{{ issue.content_raw }}</td>
+    </tr>
+    {% for comment in comments %}
+    <tr>
+        <th align="right" valign="top">{{ comment.user }}<br>{{ issue.created_at_bb | date:'Y-m-d H:i' }}</th>
+        <td><pre>{{ comment.content_raw }}</td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+
+
+
+{% endblock %}

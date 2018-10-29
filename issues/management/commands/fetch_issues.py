@@ -8,7 +8,14 @@ from django.core.management.base import BaseCommand
 from conf.utils import get_setting, set_setting
 from repo.models import Repo
 from repo.models import FetchQueue
-from issues.models import Issue
+from issues.models import Issue, Comment
+
+
+def to_date(v):
+    if v:
+        return datetime.strptime(v[:29] + v[30:], "%Y-%m-%dT%H:%M:%S.%f%z")
+    else:
+        return None
 
 
 class Command(BaseCommand):
@@ -104,6 +111,38 @@ class Command(BaseCommand):
 
         print('finished fetching %s repo details. ' % num_repos)
 
+    def fetch_comments(self, repo, issue):
+
+        url = 'https://api.bitbucket.org/2.0/repositories/%s/%s/issues/%s/comments' % (self.conf_username, repo.slug, issue.issue_id)
+        while url:
+            rsp = self.load_url(url)
+
+            for values in rsp.get('values', []):
+
+                import pprint; pprint.pprint(values)
+
+                comment = Comment.objects.filter(comment_id=values.get('id')).last()
+                save_required = False
+
+                if not comment:
+                    comment = Comment()
+                    comment.comment_id = values.get('id')
+                    save_required = True
+                elif values.get('updated_on'):
+                    if comment.updated_at_bb != to_date(values.get('updated_on')):
+                        save_required = True
+
+                if save_required:
+                    comment.content_raw = values.get('content', {}).get('raw')
+                    comment.content_html = values.get('content', {}).get('html')
+                    comment.user = values.get('user', {}).get('username')
+                    comment.created_at_bb = to_date(values['created_on'])
+                    comment.updated_at_bb = to_date(values['updated_on']) if values['updated_on'] else None
+                    comment.issue = issue
+                    comment.save()
+
+            url = rsp.get('next')
+
     def fetch_issues(self, repo):
         assert isinstance(repo, Repo), "Invalid repo given to fetch %r" % repo
 
@@ -116,20 +155,29 @@ class Command(BaseCommand):
             rsp = self.load_url(url)
             for values in rsp.get('values', []):
                 num_issues += 1
+                issue = Issue.objects.filter(repository=repo, issue_id=values.get('id')).last() or Issue()
+                if issue.updated_at_bb != to_date(values['updated_on']):
+                    issue.issue_id = int(values.get('id'))
+                    issue.repository = repo
+                    issue.assignee = values.get('assignee', {}).get('username') if values.get('assignee') else None
+                    issue.reporter = values.get('reporter', {}).get('username') if values.get('reporter') else None
+                    issue.state = values.get('state')
+                    issue.title = values.get('title')
+                    issue.type = values.get('type')
+                    issue.kind = values.get('kind')
+                    issue.content_raw = values.get('content', {}).get('raw')
+                    issue.content_html = values.get('content', {}).get('html')
+                    issue.priority = values.get('priority')
+                    issue.created_at_bb = to_date(values['created_on'])
+                    issue.updated_at_bb = to_date(values['updated_on'])
+                    issue.save()
 
-                issue = Issue.objects.filter(repository=repo, id=values.get('id')).last() or Issue()
-                issue.assignee = values.get('assignee', {}).get('username') if values.get('assignee') else None
-                issue.state = values.get('state')
-                issue.title = values.get('title')
-                issue.type = values.get('type')
-                issue.kind = values.get('kind')
-                issue.content_raw = values.get('content', {}).get('raw')
-                issue.content_html = values.get('content', {}).get('html')
-                issue.priority = values.get('priority')
-                issue.repository = repo
-                issue.save()
-                # TODO fetch comments
+                    self.fetch_comments(repo, issue)
+
             url = rsp.get('next')
+
+        repo.num_issues = num_issues
+        repo.save()
 
         print('finished fetching %s issues for %s (%s). ' % (num_issues, repo.name, repo.slug))
 
